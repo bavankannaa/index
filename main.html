@@ -1,0 +1,566 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RainGuard Farmer Robot</title>
+
+<style>
+:root {
+  --bg: #08111f;
+  --panel: #111e30;
+  --panel2: #17263b;
+  --green: #42e69b;
+  --blue: #5aa9ff;
+  --red: #ff6474;
+  --text: #f3f7ff;
+  --muted: #9aacc4;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: Arial, sans-serif;
+}
+button { cursor: pointer; font: inherit; }
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 5%;
+  background: #0d192a;
+  border-bottom: 1px solid #26374e;
+  gap: 12px;
+}
+.brand { font-size: 22px; font-weight: 800; }
+.brand span { color: var(--green); }
+.status {
+  padding: 8px 12px;
+  border-radius: 20px;
+  background: #26374b;
+  font-size: 12px;
+}
+main { max-width: 1200px; margin: auto; padding: 25px 16px; }
+.hero {
+  padding: 26px;
+  border-radius: 20px;
+  background: linear-gradient(125deg,#133a38,#142b48 75%);
+  margin-bottom: 22px;
+}
+.hero h1 { margin: 0 0 10px; font-size: clamp(25px,4vw,38px); }
+.hero p { color: #c2d4e9; line-height: 1.6; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+.btn {
+  border: 0; padding: 12px 16px; border-radius: 10px;
+  background: var(--green); color: #06170f; font-weight: bold;
+}
+.btn.secondary { background: #263b54; color: white; }
+.btn.danger { background: #582531; color: #ffd8dd; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2,minmax(0,1fr));
+  gap: 18px;
+}
+.card {
+  background: var(--panel);
+  border: 1px solid #24354b;
+  padding: 20px;
+  border-radius: 17px;
+  min-width: 0;
+}
+.card h2 { margin: 0 0 16px; font-size: 18px; }
+.metric {
+  font-size: 30px;
+  font-weight: 800;
+  margin: 12px 0;
+}
+.small { color: var(--muted); font-size: 13px; line-height: 1.5; }
+.tag { color: var(--green); font-size: 12px; font-weight: bold; }
+.bar {
+  height: 9px;
+  background: #26374b;
+  border-radius: 10px;
+  overflow: hidden;
+  margin: 14px 0;
+}
+.bar div {
+  width: 40%;
+  height: 100%;
+  background: var(--green);
+  transition: width .3s;
+}
+.motor-layout {
+  display: grid;
+  grid-template-columns: repeat(3,64px);
+  justify-content: center;
+  gap: 9px;
+  margin: 20px 0;
+}
+.motor {
+  height: 58px;
+  border: 1px solid #3b526e;
+  border-radius: 13px;
+  color: white;
+  background: #21344b;
+  font-size: 21px;
+}
+.motor:active { background: #247d61; }
+.motor.stop { background: #582531; }
+.mode-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.alert {
+  padding: 13px;
+  background: #192b40;
+  border-radius: 10px;
+  margin-top: 12px;
+  font-size: 14px;
+  line-height: 1.5;
+}
+.alert.warning { background: #452b21; color: #ffdab2; }
+.alert.good { background: #12392d; color: #b4ffdc; }
+.switch-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 14px 0;
+}
+select {
+  background: #21344b; color: white; padding: 10px;
+  border: 1px solid #3b526e; border-radius: 8px;
+}
+.log {
+  max-height: 170px;
+  overflow: auto;
+  font-size: 12px;
+  color: #b7c7db;
+  line-height: 1.8;
+}
+footer { text-align: center; color: var(--muted); padding: 28px 12px; }
+@media(max-width:650px) {
+  .grid { grid-template-columns: 1fr; }
+  header { padding: 15px; }
+  .brand { font-size: 18px; }
+  main { padding: 16px 12px; }
+  .hero { padding: 20px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="brand">🌱 Rain<span>Guard</span></div>
+  <div class="status" id="connection">● DEMO MODE</div>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="tag">SMART FARMING ROBOT</div>
+    <h1>Farmer Control Center</h1>
+    <p>
+      Monitor rain, check soil moisture, drive your robot, and
+      control irrigation from one dashboard.
+    </p>
+    <div class="actions">
+      <button class="btn" id="connectBtn">Connect Android Bridge</button>
+      <button class="btn secondary" id="demoBtn">Run Demo</button>
+      <button class="btn danger" id="stopAll">EMERGENCY STOP</button>
+    </div>
+    <p class="small" id="connectionHelp">
+      Demo mode is active. Commands are simulated and are not sent to hardware.
+    </p>
+  </section>
+
+  <section class="grid">
+    <article class="card">
+      <h2>🌧️ Rain Sensor</h2>
+      <div class="tag" id="rainTag">SIMULATED READING</div>
+      <div class="metric" id="rainValue">No Rain</div>
+      <p class="small">Rain detection from the Arduino sensor.</p>
+      <div class="alert good" id="rainAlert">No rain detected in demo.</div>
+    </article>
+
+    <article class="card">
+      <h2>🌿 Soil Moisture</h2>
+      <div class="tag">ANALOG INPUT A0</div>
+      <div class="metric"><span id="soilValue">420</span> <span style="font-size:14px">/ 1023</span></div>
+      <div class="bar"><div id="soilBar"></div></div>
+      <div id="soilState" class="alert good">Soil moisture reading is simulated.</div>
+      <p class="small">Threshold must be calibrated for your sensor and soil.</p>
+    </article>
+
+    <article class="card">
+      <h2>🛞 Wheel Motor Control</h2>
+      <p class="small">Hold a direction button to keep sending movement commands.</p>
+      <div class="motor-layout">
+        <div></div>
+        <button class="motor" data-cmd="F">▲</button>
+        <div></div>
+        <button class="motor" data-cmd="L">◀</button>
+        <button class="motor stop" data-cmd="S">■</button>
+        <button class="motor" data-cmd="R">▶</button>
+        <div></div>
+        <button class="motor" data-cmd="B">▼</button>
+        <div></div>
+      </div>
+      <div class="switch-row">
+        <span>Movement status</span>
+        <strong id="motorState">STOPPED</strong>
+      </div>
+      <div class="mode-row">
+        <button class="btn" id="autoMode">Automatic Mode</button>
+        <button class="btn secondary" id="manualMode">Manual Mode</button>
+      </div>
+      <p class="small" id="modeState">Current mode: Manual</p>
+    </article>
+
+    <article class="card">
+      <h2>💧 Water Pump</h2>
+      <div class="switch-row">
+        <span>Pump status</span>
+        <strong id="pumpState">OFF</strong>
+      </div>
+      <div class="actions">
+        <button class="btn" id="pumpOn">Pump ON</button>
+        <button class="btn secondary" id="pumpOff">Pump OFF</button>
+      </div>
+      <div class="alert" id="pumpAlert">
+        Pump is off. Automatic mode waters dry soil when it is not raining.
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>⚙️ Settings</h2>
+      <div class="switch-row">
+        <label for="threshold">Dry soil threshold</label>
+        <select id="threshold">
+          <option value="500">500</option>
+          <option value="600" selected>600</option>
+          <option value="650">650</option>
+          <option value="700">700</option>
+          <option value="800">800</option>
+        </select>
+      </div>
+      <div class="switch-row">
+        <label for="simulationRain">Simulate rain</label>
+        <input type="checkbox" id="simulationRain">
+      </div>
+      <div class="switch-row">
+        <label for="simulationSoil">Simulated soil is dry</label>
+        <input type="checkbox" id="simulationSoil">
+      </div>
+      <p class="small">Simulation settings affect demo readings only.</p>
+    </article>
+
+    <article class="card">
+      <h2>📋 Activity Log</h2>
+      <div id="log" class="log">RainGuard app started.</div>
+      <button class="btn secondary" id="clearLog">Clear Log</button>
+    </article>
+  </section>
+</main>
+
+<footer>RainGuard Farmer Robot · Smart Agriculture Dashboard</footer>
+
+<script>
+const $ = id => document.getElementById(id);
+
+let connected = false;
+let demo = true;
+let auto = false;
+let rain = false;
+let soilDry = false;
+let pump = false;
+let motor = "S";
+let bridge = null;
+let moveTimer = null;
+let sensorTimer = null;
+
+function log(message) {
+  const time = new Date().toLocaleTimeString();
+  $("log").innerHTML =
+    `<div>[${time}] ${escapeHTML(message)}</div>` +
+    $("log").innerHTML;
+}
+
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, c => ({
+    "&":"&amp;", "<":"&lt;", ">":"&gt;",
+    '"':"&quot;", "'":"&#39;"
+  })[c]);
+}
+
+function updateConnection() {
+  $("connection").textContent = connected
+    ? "● ANDROID BRIDGE CONNECTED"
+    : "● DEMO MODE";
+
+  $("connectionHelp").textContent = connected
+    ? "Bridge connected. Commands can be sent to the Arduino."
+    : "Demo mode is active. Hardware commands are simulated.";
+}
+
+function renderSensors(soilReading = null) {
+  $("rainValue").textContent = rain ? "RAIN DETECTED" : "No Rain";
+  $("rainAlert").textContent = rain
+    ? "Rain detected! Wheels and pump must stop."
+    : "No rain detected.";
+
+  $("rainAlert").className = rain
+    ? "alert warning" : "alert good";
+
+  const reading = soilReading === null
+    ? (soilDry ? 800 : 350) : soilReading;
+
+  $("soilValue").textContent = reading;
+  $("soilBar").style.width =
+    Math.min(100, Math.max(0, 100 - reading / 10.23)) + "%";
+
+  $("soilState").textContent = soilDry
+    ? "Soil is dry. Water may be required."
+    : "Soil is sufficiently wet.";
+
+  $("soilState").className = soilDry
+    ? "alert warning" : "alert good";
+
+  $("pumpState").textContent = pump ? "ON" : "OFF";
+  $("pumpAlert").textContent = pump
+    ? "Pump is running."
+    : "Pump is off.";
+}
+
+function sendCommand(command) {
+  if (!connected || !bridge) {
+    log("Demo only: command " + command);
+    return;
+  }
+
+  try {
+    // Android WebView bridge must implement sendCommand(string).
+    bridge.sendCommand(command);
+    log("Command sent: " + command);
+  } catch (error) {
+    log("Command failed: check Android bridge.");
+    stopMotors();
+  }
+}
+
+function stopMotors() {
+  clearInterval(moveTimer);
+  moveTimer = null;
+  motor = "S";
+  $("motorState").textContent = "STOPPED";
+  sendCommand("S");
+}
+
+function movement(command) {
+  if (rain) {
+    log("Movement blocked because rain is detected.");
+    stopMotors();
+    return;
+  }
+
+  auto = false;
+  $("modeState").textContent = "Current mode: Manual";
+  motor = command;
+
+  const names = {
+    F: "FORWARD", B: "BACKWARD",
+    L: "LEFT", R: "RIGHT", S: "STOPPED"
+  };
+
+  $("motorState").textContent = names[command] || "STOPPED";
+
+  clearInterval(moveTimer);
+  sendCommand(command);
+
+  if (command !== "S") {
+    // Refresh the movement command before the Arduino timeout.
+    moveTimer = setInterval(() => sendCommand(command), 400);
+  }
+}
+
+document.querySelectorAll("[data-cmd]").forEach(button => {
+  const command = button.dataset.cmd;
+
+  button.addEventListener("pointerdown", event => {
+    event.preventDefault();
+    movement(command);
+  });
+
+  button.addEventListener("pointerup", () => {
+    if (command !== "S") stopMotors();
+  });
+
+  button.addEventListener("pointercancel", stopMotors);
+  button.addEventListener("lostpointercapture", () => {
+    if (command !== "S") stopMotors();
+  });
+
+  button.addEventListener("contextmenu", event => event.preventDefault());
+});
+
+$("stopAll").addEventListener("click", () => {
+  stopMotors();
+  pump = false;
+  sendCommand("O");
+  $("pumpState").textContent = "OFF";
+  log("Emergency stop requested.");
+});
+
+$("manualMode").addEventListener("click", () => {
+  auto = false;
+  stopMotors();
+  sendCommand("M");
+  pump = false;
+  renderSensors();
+  $("modeState").textContent = "Current mode: Manual";
+  log("Manual mode selected.");
+});
+
+$("autoMode").addEventListener("click", () => {
+  auto = true;
+  stopMotors();
+  sendCommand("A");
+  $("modeState").textContent = "Current mode: Automatic";
+  updateAutomaticPump();
+  log("Automatic mode selected.");
+});
+
+function updateAutomaticPump() {
+  if (!auto) return;
+
+  const shouldWater = !rain && soilDry;
+
+  if (pump !== shouldWater) {
+    pump = shouldWater;
+    sendCommand(pump ? "P" : "O");
+    log(pump ? "Automatic watering requested." :
+                "Automatic watering stopped.");
+  }
+
+  renderSensors();
+}
+
+$("pumpOn").addEventListener("click", () => {
+  if (rain || !soilDry) {
+    log("Pump blocked: rain detected or soil is not dry.");
+    return;
+  }
+
+  auto = false;
+  pump = true;
+  sendCommand("M");
+  sendCommand("P");
+  $("modeState").textContent = "Current mode: Manual";
+  renderSensors();
+  log("Manual pump ON requested.");
+});
+
+$("pumpOff").addEventListener("click", () => {
+  pump = false;
+  sendCommand("O");
+  renderSensors();
+  log("Pump OFF requested.");
+});
+
+$("simulationRain").addEventListener("change", event => {
+  rain = event.target.checked;
+
+  if (rain) {
+    stopMotors();
+    pump = false;
+    sendCommand("O");
+    log("Simulated rain detected. Motors and pump stopped.");
+  }
+
+  renderSensors();
+  updateAutomaticPump();
+});
+
+$("simulationSoil").addEventListener("change", event => {
+  soilDry = event.target.checked;
+  renderSensors();
+  updateAutomaticPump();
+});
+
+$("threshold").addEventListener("change", () => {
+  log("Demo threshold changed to " + $("threshold").value);
+});
+
+$("demoBtn").addEventListener("click", () => {
+  connected = false;
+  demo = true;
+  bridge = null;
+  updateConnection();
+  log("Demo mode enabled.");
+});
+
+// A native Android WebView can expose:
+// window.Android.sendCommand("F")
+// and optionally window.Android.isConnected().
+$("connectBtn").addEventListener("click", () => {
+  if (window.Android &&
+      typeof window.Android.sendCommand === "function") {
+    bridge = window.Android;
+    connected = true;
+    demo = false;
+    updateConnection();
+    log("Android bridge detected.");
+  } else {
+    alert(
+      "No Android Bluetooth bridge was found. " +
+      "This browser app cannot directly connect to an HC-05. " +
+      "Use an Android WebView/native Bluetooth bridge, or run Demo mode."
+    );
+  }
+});
+
+$("clearLog").addEventListener("click", () => {
+  $("log").textContent = "Log cleared.";
+});
+
+// Accept live status messages from a native Android bridge.
+// Expected example: {"rain":true,"soil":720,"pump":false}
+window.updateRainGuardStatus = function(data) {
+  if (typeof data === "string") {
+    try { data = JSON.parse(data); }
+    catch { return; }
+  }
+
+  if (typeof data.rain === "boolean") rain = data.rain;
+  if (typeof data.soil === "number") {
+    soilDry = data.soil >= Number($("threshold").value);
+    renderSensors(data.soil);
+  } else {
+    renderSensors();
+  }
+
+  if (typeof data.pump === "boolean") pump = data.pump;
+
+  if (rain) {
+    stopMotors();
+    pump = false;
+    sendCommand("O");
+  }
+
+  renderSensors();
+  updateAutomaticPump();
+};
+
+// Simulation refresh: no hardware is contacted.
+function refreshDemo() {
+  if (!connected) {
+    renderSensors();
+  }
+}
+
+sensorTimer = setInterval(refreshDemo, 1500);
+renderSensors();
+updateConnection();
+</script>
+</body>
+</html>
+
+
