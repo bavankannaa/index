@@ -231,6 +231,29 @@ footer { text-align: center; color: var(--muted); padding: 28px 12px; }
     </article>
 
     <article class="card">
+      <h2>🏡 Greenhouse Door</h2>
+
+      <div class="switch-row">
+        <span>Rain condition</span>
+        <strong id="greenhouseRain">Waiting</strong>
+      </div>
+
+      <div class="switch-row">
+        <span>Door status</span>
+        <strong id="greenhouseDoor">Unknown</strong>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="doorClose">Close Door</button>
+        <button class="btn secondary" id="doorOpen">Open Door</button>
+      </div>
+
+      <p class="small" id="doorMessage">
+        Door status will update when the Bluetooth controller reports it.
+      </p>
+    </article>
+
+    <article class="card">
       <h2>⚙️ Settings</h2>
       <div class="switch-row">
         <label for="threshold">Dry soil threshold</label>
@@ -562,5 +585,4 @@ updateConnection();
 </script>
 </body>
 </html>
-
 
