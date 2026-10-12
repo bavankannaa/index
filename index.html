@@ -34,13 +34,6 @@ body{
     margin-bottom:25px;
 }
 
-.login-image{
-    display:block;
-    width:180px;
-    height:auto;
-    margin:0 auto 20px;
-}
-
 .input-group{
     margin-bottom:20px;
 }
@@ -77,7 +70,6 @@ body{
 <body>
 
 <div class="login-container">
-    <img class="login-image" src="../OGO.png" alt="RainGuard Logo" style="width: 180px; height: auto;">
     <h2>Login</h2>
 
     <form onsubmit="return checkLogin()">
@@ -97,13 +89,17 @@ body{
 
 <script>
 function checkLogin() {
-    var correctEmail = "bavankannaa@g.com";
-    var correctPassword = "974324777";
+    var accounts = {
+        "bavankannaa@g.com": "974324777",
+        "hariharan@raingarud.com": "3162014",
+        "ajjay@raingarud.com": "123456 ",
+        "mahelakshan@raingarud.com": "123456"
+    };
 
     var email = document.getElementById("email").value.trim().toLowerCase();
     var password = document.getElementById("password").value;
 
-    if (email === correctEmail && password === correctPassword) {
+    if (accounts[email] === password) {
         alert("Login Successful!");
         window.location.assign("./main.html");
         return false;
@@ -116,6 +112,3 @@ function checkLogin() {
 
 </body>
 </html>
-
-
-
