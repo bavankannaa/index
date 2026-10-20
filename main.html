@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RainGuard Farmer Robot</title>
+<title>Pollinator Guardian | Smart Greenhouse</title>
 
 <style>
 :root {
@@ -14,574 +13,742 @@
   --green: #42e69b;
   --blue: #5aa9ff;
   --red: #ff6474;
-  --text: #f3f7ff;
-  --muted: #9aacc4;
+  --yellow: #ffd166;
+  --text: #ffffff;
+  --muted: #9aadc4;
+  --border: #263850;
 }
+
 * { box-sizing: border-box; }
+
 body {
   margin: 0;
+  padding: 22px;
   background: var(--bg);
   color: var(--text);
   font-family: Arial, sans-serif;
 }
-button { cursor: pointer; font: inherit; }
+
+button, input, select { font: inherit; }
+
+button {
+  border: 0;
+  border-radius: 10px;
+  padding: 11px 15px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+button:hover { filter: brightness(1.12); }
+button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.app { max-width: 1250px; margin: auto; }
+
 header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 18px 5%;
-  background: #0d192a;
-  border-bottom: 1px solid #26374e;
+  justify-content: space-between;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin-bottom: 25px;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
   gap: 12px;
 }
-.brand { font-size: 22px; font-weight: 800; }
-.brand span { color: var(--green); }
+
+.logo {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #153c36;
+  font-size: 26px;
+}
+
+h1 { margin: 0; font-size: 24px; }
+h2 { font-size: 18px; margin-top: 0; }
+p { line-height: 1.5; }
+
+.subtitle, .muted { color: var(--muted); }
+.subtitle { font-size: 13px; margin-top: 5px; }
+
 .status {
-  padding: 8px 12px;
-  border-radius: 20px;
-  background: #26374b;
-  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 30px;
+  padding: 10px 14px;
+  color: var(--muted);
+  font-size: 13px;
 }
-main { max-width: 1200px; margin: auto; padding: 25px 16px; }
+
+.dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--yellow);
+}
+
+.dot.connected { background: var(--green); }
+.dot.error { background: var(--red); }
+
 .hero {
-  padding: 26px;
+  background: linear-gradient(120deg, #153c36, #12243c 75%);
+  border: 1px solid #28564d;
   border-radius: 20px;
-  background: linear-gradient(125deg,#133a38,#142b48 75%);
-  margin-bottom: 22px;
+  padding: 26px;
+  margin-bottom: 20px;
 }
-.hero h1 { margin: 0 0 10px; font-size: clamp(25px,4vw,38px); }
-.hero p { color: #c2d4e9; line-height: 1.6; }
-.actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
-.btn {
-  border: 0; padding: 12px 16px; border-radius: 10px;
-  background: var(--green); color: #06170f; font-weight: bold;
-}
-.btn.secondary { background: #263b54; color: white; }
-.btn.danger { background: #582531; color: #ffd8dd; }
+
+.hero h2 { font-size: 25px; margin-bottom: 8px; }
+.hero p { color: #c1d8d7; max-width: 720px; margin-bottom: 0; }
+
 .grid {
   display: grid;
-  grid-template-columns: repeat(2,minmax(0,1fr));
-  gap: 18px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 18px;
 }
+
 .card {
-  background: var(--panel);
-  border: 1px solid #24354b;
-  padding: 20px;
-  border-radius: 17px;
   min-width: 0;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 17px;
+  padding: 20px;
 }
-.card h2 { margin: 0 0 16px; font-size: 18px; }
+
 .metric {
-  font-size: 30px;
-  font-weight: 800;
-  margin: 12px 0;
+  font-size: 34px;
+  font-weight: bold;
+  margin: 15px 0 7px;
 }
-.small { color: var(--muted); font-size: 13px; line-height: 1.5; }
-.tag { color: var(--green); font-size: 12px; font-weight: bold; }
-.bar {
-  height: 9px;
-  background: #26374b;
+
+.metric small { font-size: 16px; color: var(--muted); }
+
+.progress {
+  height: 8px;
+  background: #26364a;
   border-radius: 10px;
   overflow: hidden;
-  margin: 14px 0;
+  margin: 16px 0 10px;
 }
-.bar div {
-  width: 40%;
+
+.bar {
+  width: 0%;
   height: 100%;
   background: var(--green);
-  transition: width .3s;
+  transition: width 0.3s;
 }
-.motor-layout {
+
+.bar.blue { background: var(--blue); }
+.bar.yellow { background: var(--yellow); }
+
+.tag {
+  display: inline-block;
+  border-radius: 7px;
+  background: #203249;
+  color: var(--muted);
+  padding: 6px 9px;
+  font-size: 12px;
+}
+
+.tag.good { background: #153c30; color: var(--green); }
+.tag.warning { background: #44351c; color: var(--yellow); }
+.tag.bad { background: #48232d; color: var(--red); }
+
+.two-col {
   display: grid;
-  grid-template-columns: repeat(3,64px);
-  justify-content: center;
-  gap: 9px;
-  margin: 20px 0;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 18px;
 }
-.motor {
-  height: 58px;
-  border: 1px solid #3b526e;
-  border-radius: 13px;
-  color: white;
-  background: #21344b;
-  font-size: 21px;
-}
-.motor:active { background: #247d61; }
-.motor.stop { background: #582531; }
-.mode-row { display: flex; gap: 10px; flex-wrap: wrap; }
-.alert {
-  padding: 13px;
-  background: #192b40;
-  border-radius: 10px;
-  margin-top: 12px;
-  font-size: 14px;
-  line-height: 1.5;
-}
-.alert.warning { background: #452b21; color: #ffdab2; }
-.alert.good { background: #12392d; color: #b4ffdc; }
-.switch-row {
+
+.control-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin: 14px 0;
+  padding: 15px 0;
+  border-bottom: 1px solid var(--border);
 }
-select {
-  background: #21344b; color: white; padding: 10px;
-  border: 1px solid #3b526e; border-radius: 8px;
+
+.control-row:last-child { border-bottom: 0; }
+
+.control-title { font-weight: bold; }
+.control-desc { color: var(--muted); font-size: 12px; margin-top: 5px; }
+
+.btn-green { background: var(--green); color: #071a13; }
+.btn-blue { background: var(--blue); color: #071626; }
+.btn-red { background: var(--red); color: #24070b; }
+.btn-dark { background: #263850; color: white; }
+.btn-yellow { background: var(--yellow); color: #281c00; }
+
+.button-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
+
+input[type="number"], select {
+  width: 100%;
+  color: white;
+  background: var(--panel2);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 11px;
+  margin-top: 7px;
+}
+
+.setting { margin: 15px 0; }
+.setting label { font-size: 13px; color: var(--muted); }
+
+.alert {
+  border: 1px solid var(--border);
+  background: var(--panel2);
+  border-radius: 11px;
+  padding: 12px;
+  margin-top: 10px;
+  font-size: 13px;
+}
+
+.alert.good { border-color: #286c52; }
+.alert.warning { border-color: #80632a; }
+.alert.bad { border-color: #813543; }
+
 .log {
-  max-height: 170px;
-  overflow: auto;
-  font-size: 12px;
-  color: #b7c7db;
-  line-height: 1.8;
+  max-height: 230px;
+  overflow-y: auto;
 }
-footer { text-align: center; color: var(--muted); padding: 28px 12px; }
-@media(max-width:650px) {
+
+.log-item {
+  border-bottom: 1px solid var(--border);
+  padding: 11px 0;
+  font-size: 13px;
+}
+
+.log-item:last-child { border-bottom: 0; }
+.log-time { color: var(--muted); font-size: 11px; margin-bottom: 5px; }
+
+footer {
+  text-align: center;
+  color: var(--muted);
+  font-size: 12px;
+  padding: 18px 0 4px;
+}
+
+@media (max-width: 850px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .two-col { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 520px) {
+  body { padding: 13px; }
   .grid { grid-template-columns: 1fr; }
-  header { padding: 15px; }
-  .brand { font-size: 18px; }
-  main { padding: 16px 12px; }
   .hero { padding: 20px; }
+  .hero h2 { font-size: 21px; }
+  .control-row { align-items: flex-start; flex-direction: column; }
+  .metric { font-size: 30px; }
 }
 </style>
 </head>
 
 <body>
+<div class="app">
+
 <header>
-  <div class="brand">🌱 Rain<span>Guard</span></div>
-  <div class="status" id="connection">● DEMO MODE</div>
+  <div class="brand">
+    <div class="logo">🌿</div>
+    <div>
+      <h1>Pollinator Guardian</h1>
+      <div class="subtitle">Smart Greenhouse Monitoring System</div>
+    </div>
+  </div>
+
+  <div class="status">
+    <span id="connectionDot" class="dot"></span>
+    <span id="connectionText">Not connected</span>
+  </div>
 </header>
 
-<main>
-  <section class="hero">
-    <div class="tag">SMART FARMING ROBOT</div>
-    <h1>Farmer Control Center</h1>
-    <p>
-      Monitor rain, check soil moisture, drive your robot, and
-      control irrigation from one dashboard.
+<section class="hero">
+  <h2>Protect Plants. Support Pollinators. 🌼</h2>
+  <p>
+    Monitor greenhouse soil moisture, air humidity and temperature.
+    Control watering and ventilation using Bluetooth, with automatic
+    watering when the soil becomes dry.
+  </p>
+  <div class="button-group" style="margin-top:18px">
+    <button class="btn-green" id="connectBtn" onclick="connectBluetooth()">
+      Connect Bluetooth
+    </button>
+    <button class="btn-dark" onclick="startDemo()">
+      Try Demo
+    </button>
+    <button class="btn-dark" onclick="disconnectBluetooth()">
+      Disconnect
+    </button>
+  </div>
+  <p id="connectionMessage" class="subtitle">
+    Connect your supported app bridge to control the Arduino.
+  </p>
+</section>
+
+<div class="grid">
+
+  <section class="card">
+    <div class="muted">🌱 Soil Moisture</div>
+    <div class="metric"><span id="soilValue">--</span><small>%</small></div>
+    <div class="progress"><div id="soilBar" class="bar"></div></div>
+    <span id="soilTag" class="tag">Waiting for sensor</span>
+    <p class="muted" style="font-size:12px">
+      Measures how wet or dry the soil is.
     </p>
-    <div class="actions">
-      <button class="btn" id="connectBtn">Connect Android Bridge</button>
-      <button class="btn secondary" id="demoBtn">Run Demo</button>
-      <button class="btn danger" id="stopAll">EMERGENCY STOP</button>
+  </section>
+
+  <section class="card">
+    <div class="muted">💧 Air Humidity</div>
+    <div class="metric"><span id="humidityValue">--</span><small>%</small></div>
+    <div class="progress"><div id="humidityBar" class="bar blue"></div></div>
+    <span id="humidityTag" class="tag">Waiting for sensor</span>
+    <p class="muted" style="font-size:12px">
+      Monitors moisture in greenhouse air.
+    </p>
+  </section>
+
+  <section class="card">
+    <div class="muted">🌡️ Temperature</div>
+    <div class="metric"><span id="temperatureValue">--</span><small> °C</small></div>
+    <div class="progress"><div id="temperatureBar" class="bar yellow"></div></div>
+    <span id="temperatureTag" class="tag">Waiting for sensor</span>
+    <p class="muted" style="font-size:12px">
+      Helps monitor greenhouse warmth.
+    </p>
+  </section>
+
+</div>
+
+<div class="two-col">
+
+  <section class="card">
+    <h2>⚙️ Greenhouse Controls</h2>
+
+    <div class="control-row">
+      <div>
+        <div class="control-title">Operating Mode</div>
+        <div class="control-desc">Choose automatic or manual control.</div>
+      </div>
+      <div class="button-group">
+        <button id="autoBtn" class="btn-green" onclick="setMode('AUTO')">Auto</button>
+        <button id="manualBtn" class="btn-dark" onclick="setMode('MANUAL')">Manual</button>
+      </div>
     </div>
-    <p class="small" id="connectionHelp">
-      Demo mode is active. Commands are simulated and are not sent to hardware.
-    </p>
+
+    <div class="control-row">
+      <div>
+        <div class="control-title">💧 Water Pump</div>
+        <div class="control-desc">Water the plants when needed.</div>
+        <span id="pumpTag" class="tag">Status unknown</span>
+      </div>
+      <div class="button-group">
+        <button class="btn-green" onclick="setDevice('PUMP','ON')">ON</button>
+        <button class="btn-red" onclick="setDevice('PUMP','OFF')">OFF</button>
+      </div>
+    </div>
+
+    <div class="control-row">
+      <div>
+        <div class="control-title">🌀 Ventilation Fan</div>
+        <div class="control-desc">Help circulate greenhouse air.</div>
+        <span id="fanTag" class="tag">Status unknown</span>
+      </div>
+      <div class="button-group">
+        <button class="btn-green" onclick="setDevice('FAN','ON')">ON</button>
+        <button class="btn-red" onclick="setDevice('FAN','OFF')">OFF</button>
+      </div>
+    </div>
+
+    <div class="alert warning" id="modeMessage">
+      Demo is off. Connect to the Arduino control bridge to send commands.
+    </div>
   </section>
 
-  <section class="grid">
-    <article class="card">
-      <h2>🌧️ Rain Sensor</h2>
-      <div class="tag" id="rainTag">SIMULATED READING</div>
-      <div class="metric" id="rainValue">No Rain</div>
-      <p class="small">Rain detection from the Arduino sensor.</p>
-      <div class="alert good" id="rainAlert">No rain detected in demo.</div>
-    </article>
+  <section class="card">
+    <h2>🔔 Greenhouse Alerts</h2>
+    <div id="alertList">
+      <div class="alert">Waiting for sensor readings.</div>
+    </div>
 
-    <article class="card">
-      <h2>🌿 Soil Moisture</h2>
-      <div class="tag">ANALOG INPUT A0</div>
-      <div class="metric"><span id="soilValue">420</span> <span style="font-size:14px">/ 1023</span></div>
-      <div class="bar"><div id="soilBar"></div></div>
-      <div id="soilState" class="alert good">Soil moisture reading is simulated.</div>
-      <p class="small">Threshold must be calibrated for your sensor and soil.</p>
-    </article>
-
-    <article class="card">
-      <h2>🛞 Wheel Motor Control</h2>
-      <p class="small">Hold a direction button to keep sending movement commands.</p>
-      <div class="motor-layout">
-        <div></div>
-        <button class="motor" data-cmd="F">▲</button>
-        <div></div>
-        <button class="motor" data-cmd="L">◀</button>
-        <button class="motor stop" data-cmd="S">■</button>
-        <button class="motor" data-cmd="R">▶</button>
-        <div></div>
-        <button class="motor" data-cmd="B">▼</button>
-        <div></div>
-      </div>
-      <div class="switch-row">
-        <span>Movement status</span>
-        <strong id="motorState">STOPPED</strong>
-      </div>
-      <div class="mode-row">
-        <button class="btn" id="autoMode">Automatic Mode</button>
-        <button class="btn secondary" id="manualMode">Manual Mode</button>
-      </div>
-      <p class="small" id="modeState">Current mode: Manual</p>
-    </article>
-
-    <article class="card">
-      <h2>💧 Water Pump</h2>
-      <div class="switch-row">
-        <span>Pump status</span>
-        <strong id="pumpState">OFF</strong>
-      </div>
-      <div class="actions">
-        <button class="btn" id="pumpOn">Pump ON</button>
-        <button class="btn secondary" id="pumpOff">Pump OFF</button>
-      </div>
-      <div class="alert" id="pumpAlert">
-        Pump is off. Automatic mode waters dry soil when it is not raining.
-      </div>
-    </article>
-
-    <article class="card">
-      <h2>🏡 Greenhouse Door</h2>
-
-      <div class="switch-row">
-        <span>Rain condition</span>
-        <strong id="greenhouseRain">Waiting</strong>
-      </div>
-
-      <div class="switch-row">
-        <span>Door status</span>
-        <strong id="greenhouseDoor">Unknown</strong>
-      </div>
-
-      <div class="actions">
-        <button class="btn" id="doorClose">Close Door</button>
-        <button class="btn secondary" id="doorOpen">Open Door</button>
-      </div>
-
-      <p class="small" id="doorMessage">
-        Door status will update when the Bluetooth controller reports it.
-      </p>
-    </article>
-
-    <article class="card">
-      <h2>⚙️ Settings</h2>
-      <div class="switch-row">
-        <label for="threshold">Dry soil threshold</label>
-        <select id="threshold">
-          <option value="500">500</option>
-          <option value="600" selected>600</option>
-          <option value="650">650</option>
-          <option value="700">700</option>
-          <option value="800">800</option>
-        </select>
-      </div>
-      <div class="switch-row">
-        <label for="simulationRain">Simulate rain</label>
-        <input type="checkbox" id="simulationRain">
-      </div>
-      <div class="switch-row">
-        <label for="simulationSoil">Simulated soil is dry</label>
-        <input type="checkbox" id="simulationSoil">
-      </div>
-      <p class="small">Simulation settings affect demo readings only.</p>
-    </article>
-
-    <article class="card">
-      <h2>📋 Activity Log</h2>
-      <div id="log" class="log">RainGuard app started.</div>
-      <button class="btn secondary" id="clearLog">Clear Log</button>
-    </article>
+    <h2 style="margin-top:24px">📋 Current Status</h2>
+    <div class="control-row">
+      <span class="muted">Operating mode</span>
+      <strong id="modeValue">Unknown</strong>
+    </div>
+    <div class="control-row">
+      <span class="muted">Pump</span>
+      <strong id="pumpValue">Unknown</strong>
+    </div>
+    <div class="control-row">
+      <span class="muted">Fan</span>
+      <strong id="fanValue">Unknown</strong>
+    </div>
   </section>
-</main>
 
-<footer>RainGuard Farmer Robot · Smart Agriculture Dashboard</footer>
+</div>
+
+<div class="two-col">
+
+  <section class="card">
+    <h2>🛠️ Automation Settings</h2>
+
+    <div class="setting">
+      <label for="dryThreshold">Start watering when soil moisture is below (%)</label>
+      <input type="number" id="dryThreshold" min="0" max="100" value="35">
+    </div>
+
+    <div class="setting">
+      <label for="fanThreshold">Turn fan on when temperature is above (°C)</label>
+      <input type="number" id="fanThreshold" min="0" max="80" value="30">
+    </div>
+
+    <div class="setting">
+      <label for="humidityThreshold">Low air humidity alert below (%)</label>
+      <input type="number" id="humidityThreshold" min="0" max="100" value="40">
+    </div>
+
+    <button class="btn-blue" onclick="saveSettings()">Save Settings</button>
+
+    <div class="alert warning">
+      These settings update the dashboard. For real automatic control,
+      the Arduino firmware must use the same thresholds and sensor readings.
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>📝 Activity Log</h2>
+    <div class="button-group" style="margin-bottom:12px">
+      <button class="btn-dark" onclick="clearLog()">Clear Log</button>
+    </div>
+    <div id="activityLog" class="log">
+      <div class="log-item">
+        <div class="log-time">Ready</div>
+        Pollinator Guardian dashboard started.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  Pollinator Guardian • Smart Greenhouse School Project
+</footer>
+
+</div>
 
 <script>
+const state = {
+  connected: false,
+  demo: false,
+  mode: "MANUAL",
+  pump: false,
+  fan: false,
+  soil: null,
+  humidity: null,
+  temperature: null
+};
+
 const $ = id => document.getElementById(id);
 
-let connected = false;
-let demo = true;
-let auto = false;
-let rain = false;
-let soilDry = false;
-let pump = false;
-let motor = "S";
-let bridge = null;
-let moveTimer = null;
-let sensorTimer = null;
-
 function log(message) {
-  const time = new Date().toLocaleTimeString();
-  $("log").innerHTML =
-    `<div>[${time}] ${escapeHTML(message)}</div>` +
-    $("log").innerHTML;
+  const entry = document.createElement("div");
+  entry.className = "log-item";
+
+  const time = document.createElement("div");
+  time.className = "log-time";
+  time.textContent = new Date().toLocaleTimeString();
+
+  const detail = document.createElement("div");
+  detail.textContent = message;
+
+  entry.append(time, detail);
+  $("activityLog").prepend(entry);
 }
 
-function escapeHTML(value) {
-  return String(value).replace(/[&<>"']/g, c => ({
-    "&":"&amp;", "<":"&lt;", ">":"&gt;",
-    '"':"&quot;", "'":"&#39;"
-  })[c]);
-}
-
-function updateConnection() {
-  $("connection").textContent = connected
-    ? "● ANDROID BRIDGE CONNECTED"
-    : "● DEMO MODE";
-
-  $("connectionHelp").textContent = connected
-    ? "Bridge connected. Commands can be sent to the Arduino."
-    : "Demo mode is active. Hardware commands are simulated.";
-}
-
-function renderSensors(soilReading = null) {
-  $("rainValue").textContent = rain ? "RAIN DETECTED" : "No Rain";
-  $("rainAlert").textContent = rain
-    ? "Rain detected! Wheels and pump must stop."
-    : "No rain detected.";
-
-  $("rainAlert").className = rain
-    ? "alert warning" : "alert good";
-
-  const reading = soilReading === null
-    ? (soilDry ? 800 : 350) : soilReading;
-
-  $("soilValue").textContent = reading;
-  $("soilBar").style.width =
-    Math.min(100, Math.max(0, 100 - reading / 10.23)) + "%";
-
-  $("soilState").textContent = soilDry
-    ? "Soil is dry. Water may be required."
-    : "Soil is sufficiently wet.";
-
-  $("soilState").className = soilDry
-    ? "alert warning" : "alert good";
-
-  $("pumpState").textContent = pump ? "ON" : "OFF";
-  $("pumpAlert").textContent = pump
-    ? "Pump is running."
-    : "Pump is off.";
+function setConnection(connected, message) {
+  state.connected = connected;
+  $("connectionDot").className = connected ? "dot connected" : "dot";
+  $("connectionText").textContent = connected ? "Connected" : "Not connected";
+  $("connectionMessage").textContent = message;
 }
 
 function sendCommand(command) {
-  if (!connected || !bridge) {
-    log("Demo only: command " + command);
-    return;
-  }
-
-  try {
-    // Android WebView bridge must implement sendCommand(string).
-    bridge.sendCommand(command);
+  // Supported Android WebView integration:
+  // Android app should provide window.Android.sendCommand(command).
+  if (window.Android && typeof window.Android.sendCommand === "function") {
+    window.Android.sendCommand(command);
     log("Command sent: " + command);
-  } catch (error) {
-    log("Command failed: check Android bridge.");
-    stopMotors();
+    return true;
   }
+
+  if (state.demo) {
+    log("Demo command: " + command);
+    return true;
+  }
+
+  $("modeMessage").textContent =
+    "Command not sent: connect through an Android Bluetooth bridge first.";
+  log("Command not sent; no Bluetooth bridge available: " + command);
+  return false;
 }
 
-function stopMotors() {
-  clearInterval(moveTimer);
-  moveTimer = null;
-  motor = "S";
-  $("motorState").textContent = "STOPPED";
-  sendCommand("S");
-}
-
-function movement(command) {
-  if (rain) {
-    log("Movement blocked because rain is detected.");
-    stopMotors();
+function connectBluetooth() {
+  if (window.Android && typeof window.Android.sendCommand === "function") {
+    setConnection(true, "Connected through the Android Bluetooth bridge.");
+    state.demo = false;
+    log("Bluetooth bridge detected.");
     return;
   }
 
-  auto = false;
-  $("modeState").textContent = "Current mode: Manual";
-  motor = command;
-
-  const names = {
-    F: "FORWARD", B: "BACKWARD",
-    L: "LEFT", R: "RIGHT", S: "STOPPED"
-  };
-
-  $("motorState").textContent = names[command] || "STOPPED";
-
-  clearInterval(moveTimer);
-  sendCommand(command);
-
-  if (command !== "S") {
-    // Refresh the movement command before the Arduino timeout.
-    moveTimer = setInterval(() => sendCommand(command), 400);
-  }
+  setConnection(false,
+    "This browser cannot connect directly to HC-05 using this button. Open the app in a compatible Android WebView with a Bluetooth bridge.");
+  log("Bluetooth connection needs an Android bridge or compatible Bluetooth application.");
 }
 
-document.querySelectorAll("[data-cmd]").forEach(button => {
-  const command = button.dataset.cmd;
-
-  button.addEventListener("pointerdown", event => {
-    event.preventDefault();
-    movement(command);
-  });
-
-  button.addEventListener("pointerup", () => {
-    if (command !== "S") stopMotors();
-  });
-
-  button.addEventListener("pointercancel", stopMotors);
-  button.addEventListener("lostpointercapture", () => {
-    if (command !== "S") stopMotors();
-  });
-
-  button.addEventListener("contextmenu", event => event.preventDefault());
-});
-
-$("stopAll").addEventListener("click", () => {
-  stopMotors();
-  pump = false;
-  sendCommand("O");
-  $("pumpState").textContent = "OFF";
-  log("Emergency stop requested.");
-});
-
-$("manualMode").addEventListener("click", () => {
-  auto = false;
-  stopMotors();
-  sendCommand("M");
-  pump = false;
-  renderSensors();
-  $("modeState").textContent = "Current mode: Manual";
-  log("Manual mode selected.");
-});
-
-$("autoMode").addEventListener("click", () => {
-  auto = true;
-  stopMotors();
-  sendCommand("A");
-  $("modeState").textContent = "Current mode: Automatic";
-  updateAutomaticPump();
-  log("Automatic mode selected.");
-});
-
-function updateAutomaticPump() {
-  if (!auto) return;
-
-  const shouldWater = !rain && soilDry;
-
-  if (pump !== shouldWater) {
-    pump = shouldWater;
-    sendCommand(pump ? "P" : "O");
-    log(pump ? "Automatic watering requested." :
-                "Automatic watering stopped.");
-  }
-
-  renderSensors();
+function disconnectBluetooth() {
+  state.demo = false;
+  setConnection(false, "Disconnected. Sensor values may remain visible until updated.");
+  log("Dashboard disconnected.");
 }
 
-$("pumpOn").addEventListener("click", () => {
-  if (rain || !soilDry) {
-    log("Pump blocked: rain detected or soil is not dry.");
+function startDemo() {
+  state.demo = true;
+  setConnection(true, "Demo mode: readings and controls are simulated, not real hardware.");
+  $("modeMessage").textContent =
+    "Demo mode is active. Button actions are simulations only.";
+  log("Demo mode started.");
+
+  updateReadings({
+    soil: 28,
+    humidity: 55,
+    temperature: 29
+  });
+
+  updateDeviceStatus({
+    mode: "MANUAL",
+    pump: false,
+    fan: false
+  });
+}
+
+function setMode(mode) {
+  if (!state.demo && !state.connected) {
+    log("Connect first before changing the Arduino mode.");
+    $("modeMessage").textContent = "Connect to the Arduino before sending commands.";
     return;
   }
 
-  auto = false;
-  pump = true;
-  sendCommand("M");
-  sendCommand("P");
-  $("modeState").textContent = "Current mode: Manual";
-  renderSensors();
-  log("Manual pump ON requested.");
-});
+  if (sendCommand("MODE:" + mode)) {
+    state.mode = mode;
+    $("modeValue").textContent = mode;
+    $("autoBtn").className = mode === "AUTO" ? "btn-green" : "btn-dark";
+    $("manualBtn").className = mode === "MANUAL" ? "btn-green" : "btn-dark";
+    $("modeMessage").textContent = mode === "AUTO"
+      ? "Automatic mode selected. Ensure automatic logic is enabled in the Arduino firmware."
+      : "Manual mode selected. Use the pump and fan buttons.";
+    log("Operating mode changed to " + mode + ".");
+  }
+}
 
-$("pumpOff").addEventListener("click", () => {
-  pump = false;
-  sendCommand("O");
-  renderSensors();
-  log("Pump OFF requested.");
-});
-
-$("simulationRain").addEventListener("change", event => {
-  rain = event.target.checked;
-
-  if (rain) {
-    stopMotors();
-    pump = false;
-    sendCommand("O");
-    log("Simulated rain detected. Motors and pump stopped.");
+function setDevice(device, action) {
+  if (state.mode === "AUTO" && !state.demo) {
+    log("Switch to manual mode before using manual controls.");
+    $("modeMessage").textContent =
+      "Manual device buttons are disabled while automatic mode is selected.";
+    return;
   }
 
-  renderSensors();
-  updateAutomaticPump();
-});
+  if (!state.demo && !state.connected) {
+    log("Connect first before controlling the " + device.toLowerCase() + ".");
+    $("modeMessage").textContent = "Connect to the Arduino before sending commands.";
+    return;
+  }
 
-$("simulationSoil").addEventListener("change", event => {
-  soilDry = event.target.checked;
-  renderSensors();
-  updateAutomaticPump();
-});
+  if (!sendCommand(device + ":" + action)) return;
 
-$("threshold").addEventListener("change", () => {
-  log("Demo threshold changed to " + $("threshold").value);
-});
+  const on = action === "ON";
 
-$("demoBtn").addEventListener("click", () => {
-  connected = false;
-  demo = true;
-  bridge = null;
-  updateConnection();
-  log("Demo mode enabled.");
-});
+  if (device === "PUMP") {
+    state.pump = on;
+    $("pumpTag").textContent = on ? "ON" : "OFF";
+    $("pumpValue").textContent = on ? "ON" : "OFF";
+  }
 
-// A native Android WebView can expose:
-// window.Android.sendCommand("F")
-// and optionally window.Android.isConnected().
-$("connectBtn").addEventListener("click", () => {
-  if (window.Android &&
-      typeof window.Android.sendCommand === "function") {
-    bridge = window.Android;
-    connected = true;
-    demo = false;
-    updateConnection();
-    log("Android bridge detected.");
+  if (device === "FAN") {
+    state.fan = on;
+    $("fanTag").textContent = on ? "ON" : "OFF";
+    $("fanValue").textContent = on ? "ON" : "OFF";
+  }
+
+  log(device + " switched " + action + ".");
+}
+
+function updateReadings(data) {
+  if (typeof data.soil === "number" && Number.isFinite(data.soil)) {
+    state.soil = Math.max(0, Math.min(100, data.soil));
+    $("soilValue").textContent = Math.round(state.soil);
+    $("soilBar").style.width = state.soil + "%";
+
+    const dry = state.soil < Number($("dryThreshold").value);
+    $("soilTag").textContent = dry ? "Soil is dry" : "Moisture adequate";
+    $("soilTag").className = "tag " + (dry ? "warning" : "good");
+  }
+
+  if (typeof data.humidity === "number" && Number.isFinite(data.humidity)) {
+    state.humidity = Math.max(0, Math.min(100, data.humidity));
+    $("humidityValue").textContent = Math.round(state.humidity);
+    $("humidityBar").style.width = state.humidity + "%";
+
+    const low = state.humidity < Number($("humidityThreshold").value);
+    $("humidityTag").textContent = low ? "Low humidity" : "Humidity monitored";
+    $("humidityTag").className = "tag " + (low ? "warning" : "good");
+  }
+
+  if (typeof data.temperature === "number" && Number.isFinite(data.temperature)) {
+    state.temperature = data.temperature;
+    $("temperatureValue").textContent = state.temperature.toFixed(1);
+    const width = Math.max(0, Math.min(100, state.temperature / 50 * 100));
+    $("temperatureBar").style.width = width + "%";
+
+    const hot = state.temperature > Number($("fanThreshold").value);
+    $("temperatureTag").textContent = hot ? "Temperature is high" : "Temperature monitored";
+    $("temperatureTag").className = "tag " + (hot ? "warning" : "good");
+  }
+
+  refreshAlerts();
+}
+
+function refreshAlerts() {
+  const alerts = [];
+
+  if (state.soil !== null) {
+    if (state.soil < Number($("dryThreshold").value)) {
+      alerts.push(["warning", "Soil moisture is low. Watering may be needed."]);
+    } else {
+      alerts.push(["good", "Soil moisture is above the configured dry threshold."]);
+    }
+  }
+
+  if (state.humidity !== null &&
+      state.humidity < Number($("humidityThreshold").value)) {
+    alerts.push(["warning", "Air humidity is below your configured threshold."]);
+  }
+
+  if (state.temperature !== null &&
+      state.temperature > Number($("fanThreshold").value)) {
+    alerts.push(["warning", "Temperature is high. Ventilation may be needed."]);
+  }
+
+  if (alerts.length === 0) {
+    alerts.push(["", "Waiting for sensor readings."]);
+  }
+
+  $("alertList").replaceChildren();
+
+  alerts.forEach(([kind, message]) => {
+    const item = document.createElement("div");
+    item.className = "alert " + kind;
+    item.textContent = message;
+    $("alertList").appendChild(item);
+  });
+}
+
+function updateDeviceStatus(data) {
+  if (data.mode === "AUTO" || data.mode === "MANUAL") {
+    state.mode = data.mode;
+    $("modeValue").textContent = data.mode;
+    $("autoBtn").className = data.mode === "AUTO" ? "btn-green" : "btn-dark";
+    $("manualBtn").className = data.mode === "MANUAL" ? "btn-green" : "btn-dark";
+  }
+
+  if (typeof data.pump === "boolean") {
+    state.pump = data.pump;
+    $("pumpValue").textContent = data.pump ? "ON" : "OFF";
+    $("pumpTag").textContent = data.pump ? "ON" : "OFF";
+  }
+
+  if (typeof data.fan === "boolean") {
+    state.fan = data.fan;
+    $("fanValue").textContent = data.fan ? "ON" : "OFF";
+    $("fanTag").textContent = data.fan ? "ON" : "OFF";
+  }
+}
+
+function saveSettings() {
+  const dry = Number($("dryThreshold").value);
+  const fan = Number($("fanThreshold").value);
+  const humidity = Number($("humidityThreshold").value);
+
+  if (![dry, humidity].every(v => Number.isFinite(v) && v >= 0 && v <= 100) ||
+      !Number.isFinite(fan) || fan < 0 || fan > 80) {
+    alert("Enter valid settings: moisture and humidity 0–100%, temperature 0–80°C.");
+    return;
+  }
+
+  log("Dashboard thresholds saved.");
+  refreshAlerts();
+
+  // The Arduino firmware must also receive/use these settings
+  // for hardware-side automatic control.
+  if (state.connected && !state.demo) {
+    sendCommand("SETTING:SOIL:" + dry);
+    sendCommand("SETTING:FAN_TEMP:" + fan);
+    sendCommand("SETTING:HUMIDITY:" + humidity);
   } else {
-    alert(
-      "No Android Bluetooth bridge was found. " +
-      "This browser app cannot directly connect to an HC-05. " +
-      "Use an Android WebView/native Bluetooth bridge, or run Demo mode."
-    );
+    log("Settings saved on the dashboard only; not sent to the Arduino.");
   }
-});
+}
 
-$("clearLog").addEventListener("click", () => {
-  $("log").textContent = "Log cleared.";
-});
+function clearLog() {
+  $("activityLog").replaceChildren();
+  log("Activity log cleared.");
+}
 
-// Accept live status messages from a native Android bridge.
-// Expected example: {"rain":true,"soil":720,"pump":false}
-window.updateRainGuardStatus = function(data) {
-  if (typeof data === "string") {
-    try { data = JSON.parse(data); }
-    catch { return; }
-  }
+/*
+  Integration contract for your Android WebView / Bluetooth bridge:
 
-  if (typeof data.rain === "boolean") rain = data.rain;
-  if (typeof data.soil === "number") {
-    soilDry = data.soil >= Number($("threshold").value);
-    renderSensors(data.soil);
-  } else {
-    renderSensors();
-  }
+  When new readings arrive, call:
+    window.updatePollinatorStatus({
+      soil: 28,
+      humidity: 55,
+      temperature: 29
+    });
 
-  if (typeof data.pump === "boolean") pump = data.pump;
+  To update device states, call:
+    window.updatePollinatorDevices({
+      mode: "AUTO",
+      pump: true,
+      fan: false
+    });
 
-  if (rain) {
-    stopMotors();
-    pump = false;
-    sendCommand("O");
-  }
-
-  renderSensors();
-  updateAutomaticPump();
+  Values above are examples only. The Bluetooth bridge and Arduino
+  firmware must implement the matching message protocol.
+*/
+window.updatePollinatorStatus = function(data) {
+  if (data && typeof data === "object") updateReadings(data);
 };
 
-// Simulation refresh: no hardware is contacted.
-function refreshDemo() {
-  if (!connected) {
-    renderSensors();
-  }
-}
+window.updatePollinatorDevices = function(data) {
+  if (data && typeof data === "object") updateDeviceStatus(data);
+};
 
-sensorTimer = setInterval(refreshDemo, 1500);
-renderSensors();
-updateConnection();
+refreshAlerts();
 </script>
 </body>
 </html>
